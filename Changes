@@ -1,11 +1,13 @@
-#------------------------------------------------------------------------
-# Version 1.00    Date: 2003/06/19 21:40
-#------------------------------------------------------------------------
+1.00    Date: 2003/06/19 21:40
 
 * Initial revision
   Copied from Class::Singleton, modified as necessary
 
+1.01    Date: 2003/06/20
 
+* Completely reworked test.pl so that
+   - it uses Test.pm
+   - tests the scope issues raised by weak references
 
 
 

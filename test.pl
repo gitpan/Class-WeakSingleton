@@ -1,51 +1,27 @@
-#
-# Class::WeakSingleton test script
-#
+# Before `make install' is performed this script should be runnable with
+# `make test'. After `make install' it hsould work as `perl test.pl'
 
-BEGIN { 
-    $| = 1; 
-    print "1..22\n"; 
-}
+#########################
 
-END   { 
-    print "not ok 1\n" unless $loaded;
-}
+# change 'tests => 1' to 'tests => last_test_to_print';
 
+use Test;
+BEGIN { plan tests => 17 };
 use Class::WeakSingleton;
+ok(1); # If we made it this far, we're ok.
 
-$loaded = 1;
-print "ok 1\n";
-
-# turn warnings on
-$^W = 1;
-
-
-
-#========================================================================
-#                           -- UTILITY SUBS --
-#========================================================================
-
-sub ok     {
-    return join('', @_ ? ("   ", @_, "\n") : (), "ok ",     ++$loaded, "\n");
-}
-
-sub not_ok { 
-    return join('', @_ ? ("   ", @_, "\n") : (), "not ok ", ++$loaded, "\n");
-}
-
-
+#########################
 
 #========================================================================
 #                         -- CLASS DEFINTIONS --
 #========================================================================
 
 #------------------------------------------------------------------------
-# define 'DerivedSingleton', a class derived from Class::Singleton 
+# define 'DerivedSingleton', a class derived from Class::WeakSingleton 
 #------------------------------------------------------------------------
 
 package DerivedSingleton;
 use base 'Class::WeakSingleton';
-
 
 #------------------------------------------------------------------------
 # define 'AnotherSingleton', a class derived from DerivedSingleton 
@@ -62,10 +38,7 @@ use base 'DerivedSingleton';
 package ArraySingleton;
 use base 'Class::WeakSingleton';
 
-sub _new_instance {
-    my $class  = shift;
-    bless [], $class;
-}
+sub _new_instance { bless [], shift }
 
 
 #------------------------------------------------------------------------
@@ -94,68 +67,55 @@ sub _new_instance {
 
 package main;
 
-# call Class::WeakSingleton->instance() twice and expect to get the same 
-# reference returned on both occasions.
+use warnings FATAL => 'all';
 
-my $s1 = Class::WeakSingleton->instance();
+{
+    my %h;
+    {
+        # call Class::WeakSingleton->instance() twice and expect to get the same 
+        # reference returned on both occasions.
+        my $s1 = Class::WeakSingleton->instance();
+        my $s2 = Class::WeakSingleton->instance();
+	
+        ok( $s1 == $s2 ); # Test 4
+	ok( $s1 == Class::WeakSingleton->instance );
+        ok( $Class::WeakSingleton::_instance == $s1 ); # Test 5
 
-#2 
-print "   Class::WeakSingleton instance 1: ",
-    defined($s1) ? ok($s1) : not_ok('<undef>');
+        $h{test} = $s1;
+    }
 
-my $s2 = Class::WeakSingleton->instance();
+    ok( $Class::WeakSingleton::_instance ); # Test 6
+}
+ok( not defined $Class::WeakSingleton::_instance ); # Test 7
 
-#3
-print "   Class::WeakSingleton instance 2: ",
-    (defined($s2) ? ok($s2) : not_ok('<undef>'));
+{
+    {
+        # call MySingleton->instance() twice and expect to get the same 
+        # reference returned on both occasions.
 
-#4
-print $s1 == $s2 
-    ? ok('Class::WeakSingleton instances are identical') 
-    : not_ok('Class::WeakSingleton instances are unique');
+        my $s3 = DerivedSingleton->instance();
+        my $s4 = DerivedSingleton->instance();
+        $s5 = DerivedSingleton->instance;
 
+        ok( $s3 == $s4 );
+        ok( $s4 == $s5 );
+    }
 
-# call MySingleton->instance() twice and expect to get the same 
-# reference returned on both occasions.
+    ok( $s5 == DerivedSingleton->instance );
+    undef $s5;
+    
+    ok( not $DerivedSingleton::_instance );
+}
 
-my $s3 = DerivedSingleton->instance();
+{
+    # call MyOtherSingleton->instance() twice and expect to get the same 
+    # reference returned on both occasions.
 
-#5
-print "   DerivedSingleton instance 1: ", 
-    defined($s3) ? ok($s3) : not_ok('<undef>');
+    my $s5 = AnotherSingleton->instance();
+    my $s6 = AnotherSingleton->instance();
 
-my $s4 = DerivedSingleton->instance();
-
-#6
-print "   DerivedSingleton instance 2: ", 
-    defined($s4) ? ok($s4) : not_ok('<undef>');
-
-#7
-print $s3 == $s4 
-    ? ok("DerivedSingleton instances are identical")
-    : not_ok("DerivedSingleton instances are unique");
-
-
-# call MyOtherSingleton->instance() twice and expect to get the same 
-# reference returned on both occasions.
-
-my $s5 = AnotherSingleton->instance();
-
-#8
-print "   AnotherSingleton instance 1: ",
-    defined($s5) ? ok($s5) : not_ok('<undef>');
-
-my $s6 = AnotherSingleton->instance();
-
-#9
-print "   AnotherSingleton instance 2: ",
-    defined($s6) ? ok($s6) : not_ok('<undef>');
-
-#10
-print $s5 == $s6 
-    ? ok("AnotherSingleton instances are identical")
-    : not_ok("AnotherSingleton instances are unique");
-
+    ok( $s5 == $s6 );
+}
 
 #------------------------------------------------------------------------
 # having checked that each instance of the same class is the same, we now
@@ -163,46 +123,21 @@ print $s5 == $s6
 # from each other 
 #------------------------------------------------------------------------
 
-#11-13
-print $s1 != $s3 
-    ? ok("Class::WeakSingleton and DerviedSingleton are different") 
-    : not_ok("Class::WeakSingleton and DerivedSingleton are identical");
-print $s1 != $s5 
-    ? ok("Class::WeakSingleton and AnotherSingleton are different") 
-    : not_ok("Class::WeakSingleton and AnotherSingleton are identical");
-print $s3 != $s5 
-    ? ok("DerivedWeakSingleton and AnotherSingleton are different") 
-    : not_ok("DerivedWeakSingleton and AnotherSingleton are identical");
-
+ok( Class::WeakSingleton->instance != DerivedSingleton->instance and
+    DerivedSingleton->instance     != AnotherSingleton->instance );
 
 
 #------------------------------------------------------------------------
-# test ListSingleton
+# test ArraySingleton
 #------------------------------------------------------------------------
 
-my $ls1 = ArraySingleton->instance();
-my $ls2 = ArraySingleton->instance();
-
-#14
-print $ls1
-    ? ok("ArraySingleton #1 is defined")
-    : not_ok("ArraySingleton #1 is not defined");
-
-#15
-print $ls2
-    ? ok("ArraySingleton #2 is defined")
-    : not_ok("ArraySingleton #2 is not defined");
-
-#16 - check they are the same reference
-print $ls1 == $ls2
-    ? ok("ArraySingleton #1 and #2 correctly reference the same list")
-    : not_ok("ArraySingleton #1 and #2 so not reference the same list");
-
-#17 - check it's a LIST reference
-print $ls1 =~ /=ARRAY/
-    ? ok("ArraySingleton correctly contains a list reference")
-    : not_ok("ArraySingleton does not contain a list reference");
-
+{
+    my $as1 = ArraySingleton->instance();
+    my $as2 = ArraySingleton->instance();
+    
+    ok( $as1 == $as2 );
+    ok( UNIVERSAL::isa( $as1, 'ARRAY' ) );
+}
 
 
 #------------------------------------------------------------------------
@@ -210,39 +145,20 @@ print $ls1 =~ /=ARRAY/
 #------------------------------------------------------------------------
 
 # create a ConfigSingleton
-my $config = { 'foo' => 'This is foo' };
-my $cs1 = ConfigSingleton->instance($config);
+{
+    my $config = { 'foo' => 'This is foo' };
+    my $cs1 = ConfigSingleton->instance($config);
+    
+    # add another parameter to the config
+    $config->{'bar'} = 'This is bar';
 
-# add another parameter to the config
-$config->{'bar'} => 'This is bar';
+    # shouldn't call new() so changes to $config shouldn't matter
+    my $cs2 = ConfigSingleton->instance($config);
 
-# shouldn't call new() so changes to $config shouldn't matter
-my $cs2 = ConfigSingleton->instance($config);
-
-#18
-print $cs1
-    ? ok("ConfigSingleton #1 is defined")
-    : not_ok("ConfigSingleton #1 is not defined");
-
-#19
-print $cs2
-    ? ok("ConfigSingleton #2 is defined")
-    : not_ok("ConfigSingleton #2 is not defined");
-
-#20 - check they are the same reference
-print $cs1 == $cs2
-    ? ok("ConfigSingleton #1 and #2 correctly reference the same object")
-    : not_ok("ConfigSingleton #1 and #2 so not reference the same object");
-
-#21 - check that 3 keys are defined in $cs1
-print scalar(keys %$cs1) == 3
-    ? ok("ConfigSingleton #1 correctly has 3 keys")
-    : not_ok("ConfigSingleton #1 does not have 3 keys");
-
-#22 - and also in $cs2
-print scalar(keys %$cs2) == 3
-    ? ok("ConfigSingleton #2 correctly has 3 keys")
-    : not_ok("ConfigSingleton #2 does not have 3 keys");
+    ok( $cs1 == $cs2 );
+    ok( 3 == scalar keys %$cs1 );
+    ok( 3 == scalar keys %$cs2 );
+}
 
 
 
