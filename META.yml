@@ -1,9 +1,10 @@
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         Class-WeakSingleton
-version:      1.02
+version:      1.03
+license:      perl
 version_from: WeakSingleton.pm
 installdirs:  site
 requires:
-
+  Scalar::Util: 0
 distribution_type: module
 generated_by: ExtUtils::MakeMaker version 6.10_07
+

@@ -13,5 +13,9 @@
 
 * Pod syntax fix
 
+1.03    Date 2003/08/06
+
+* Add SIGNATURE, MANIFEST.SKIP
+* Fixed Makefile.PL to include Scalar::Util, 5.6 prereqs.
 
 

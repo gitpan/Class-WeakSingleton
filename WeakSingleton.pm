@@ -16,7 +16,7 @@ use strict;
 use vars qw( $VERSION );
 use Scalar::Util ();
 
-$VERSION = "1.02";
+$VERSION = "1.03";
 
 # instance()
 # Module constructor. Creates an Class::WeakSingleton (or derivative)
