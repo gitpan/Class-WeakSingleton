@@ -9,7 +9,9 @@
    - it uses Test.pm
    - tests the scope issues raised by weak references
 
+1.02    Date: 2003/07/08
 
+* Pod syntax fix
 
 
 

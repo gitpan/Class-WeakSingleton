@@ -16,7 +16,7 @@ use strict;
 use vars qw( $VERSION );
 use Scalar::Util ();
 
-$VERSION = "1.01";
+$VERSION = "1.02";
 
 # instance()
 # Module constructor. Creates an Class::WeakSingleton (or derivative)
@@ -71,7 +71,7 @@ __END__
 
 =head1 NAME
 
- Class::WeakSingleton - A Singleton that expires when all the references to it expire
+Class::WeakSingleton - A Singleton that expires when all the references to it expire
 
 =head1 SYNOPSIS
 
