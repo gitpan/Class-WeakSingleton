@@ -1,9 +1,19 @@
+use 5.006;
 use ExtUtils::MakeMaker;
 
-use 5.006;
 WriteMakefile(
-    'NAME'	      => 'Class::WeakSingleton',
-    'VERSION_FROM'    => 'WeakSingleton.pm',
-    'PREREQ_PM'       => { 'Scalar::Util' => 0 },
-    'dist'            => { 'COMPRESS' => 'gzip', 'SUFFIX' => 'gz' },
+    NAME          => 'Class::WeakSingleton',
+    AUTHOR        => 'Joshua ben Jore <jjore@cpan.org>',
+    ABSTRACT_FROM => 'lib/Class/WeakSingleton.pm',
+    VERSION_FROM  => 'lib/Class/WeakSingleton.pm',
+    PREREQ_PM     => {
+        'Test::More'   => 0,
+        'Scalar::Util' => 0
+    },
+
+    # Module::Build makes my META.yml file for me.
+    NO_META => 1,
+
+    # This is some magic to get Build to ignore this file.
+    PL_FILES => {},
 );
