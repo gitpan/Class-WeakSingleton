@@ -11,9 +11,6 @@ WriteMakefile(
         'Scalar::Util' => 0
     },
 
-    # Module::Build makes my META.yml file for me.
-    NO_META => 1,
-
     # This is some magic to get Build to ignore this file.
     PL_FILES => {},
 );

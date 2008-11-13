@@ -8,13 +8,9 @@ use warnings;
 
 Class::WeakSingleton - A Singleton that expires when all the references to it expire
 
-=head1 VERSION
-
-1.04
-
 =cut
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 =head1 DESCRIPTION
 

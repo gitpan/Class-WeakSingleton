@@ -1,4 +1,3 @@
-Build.PL
 Changes
 lib/Class/WeakSingleton.pm
 Makefile.PL
@@ -6,10 +5,5 @@ MANIFEST
 MANIFEST.SKIP
 META.yml
 README
-SIGNATURE
-t/00signature.t
-t/01pod.t
-t/02pod-coverage.t
-t/03yaml.t
 t/10use.t
 t/11basic.t
